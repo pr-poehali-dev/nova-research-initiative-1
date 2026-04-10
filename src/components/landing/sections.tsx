@@ -5,8 +5,7 @@ export const sections = [
     id: 'hero',
     subtitle: <Badge variant="outline" className="text-white border-white">Лучшие цены на перелёты</Badge>,
     title: "Летите туда, куда мечтали.",
-    showButton: true,
-    buttonText: 'Найти билеты'
+    showSearch: true
   },
   {
     id: 'about',
