@@ -4,6 +4,47 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Icon from "@/components/ui/icon"
 
+const CITY_CODES: Record<string, string> = {
+  "москва": "MOW", "moscow": "MOW",
+  "санкт-петербург": "LED", "питер": "LED", "спб": "LED", "saint petersburg": "LED",
+  "новосибирск": "OVB", "екатеринбург": "SVX", "казань": "KZN",
+  "краснодар": "KRR", "сочи": "AER", "анапа": "AAQ",
+  "калининград": "KGD", "уфа": "UFA", "самара": "KUF",
+  "ростов": "ROV", "ростов-на-дону": "ROV",
+  "нижний новгород": "GOJ", "омск": "OMS", "челябинск": "CEK",
+  "владивосток": "VVO", "иркутск": "IKT", "красноярск": "KJA",
+  "дубай": "DXB", "dubai": "DXB",
+  "стамбул": "IST", "istanbul": "IST",
+  "париж": "PAR", "paris": "PAR",
+  "лондон": "LON", "london": "LON",
+  "берлин": "BER", "berlin": "BER",
+  "рим": "ROM", "rome": "ROM",
+  "барселона": "BCN", "barcelona": "BCN",
+  "амстердам": "AMS", "amsterdam": "AMS",
+  "прага": "PRG", "prague": "PRG",
+  "бангкок": "BKK", "bangkok": "BKK",
+  "токио": "TYO", "tokyo": "TYO",
+  "нью-йорк": "NYC", "new york": "NYC",
+  "бали": "DPS", "bali": "DPS",
+  "тбилиси": "TBS", "tbilisi": "TBS",
+  "ереван": "EVN", "yerevan": "EVN",
+  "алматы": "ALA", "almaty": "ALA",
+  "минск": "MSQ", "minsk": "MSQ",
+  "ташкент": "TAS", "tashkent": "TAS",
+  "анталья": "AYT", "antalya": "AYT",
+  "пхукет": "HKT", "phuket": "HKT",
+}
+
+function getCode(city: string): string {
+  return CITY_CODES[city.trim().toLowerCase()] ?? city.trim().toUpperCase().slice(0, 3)
+}
+
+function formatDateForAviasales(dateStr: string): string {
+  if (!dateStr) return ""
+  const [year, month, day] = dateStr.split("-")
+  return `${day}${month}${year.slice(2)}`
+}
+
 export default function SearchForm({ isActive }: { isActive: boolean }) {
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
@@ -13,6 +54,18 @@ export default function SearchForm({ isActive }: { isActive: boolean }) {
   const handleSwap = () => {
     setFrom(to)
     setTo(from)
+  }
+
+  const handleSearch = () => {
+    const fromCode = getCode(from || "MOW")
+    const toCode = getCode(to || "NYC")
+    const dateFormatted = formatDateForAviasales(date) || formatDateForAviasales(
+      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+    )
+    const adults = parseInt(passengers) || 1
+
+    const url = `https://www.aviasales.ru/search/${fromCode}${dateFormatted}${toCode}${adults}`
+    window.open(url, "_blank")
   }
 
   return (
@@ -32,7 +85,7 @@ export default function SearchForm({ isActive }: { isActive: boolean }) {
                 <Input
                   value={from}
                   onChange={e => setFrom(e.target.value)}
-                  placeholder="Город вылета"
+                  placeholder="Москва"
                   className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-[#FF4D00] focus:ring-[#FF4D00]/20"
                 />
               </div>
@@ -50,7 +103,7 @@ export default function SearchForm({ isActive }: { isActive: boolean }) {
                 <Input
                   value={to}
                   onChange={e => setTo(e.target.value)}
-                  placeholder="Город прилёта"
+                  placeholder="Дубай"
                   className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus:border-[#FF4D00] focus:ring-[#FF4D00]/20"
                 />
               </div>
@@ -88,6 +141,7 @@ export default function SearchForm({ isActive }: { isActive: boolean }) {
 
           <Button
             size="lg"
+            onClick={handleSearch}
             className="bg-[#FF4D00] hover:bg-[#e04400] text-white border-0 px-8 shrink-0"
           >
             <Icon name="Search" size={18} className="mr-2" />
